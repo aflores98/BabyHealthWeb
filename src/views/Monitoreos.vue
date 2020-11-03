@@ -1,0 +1,135 @@
+<template>
+  <v-container fluid class="monitoreos-container">
+    <v-row class="grid-row">
+      <v-col class="grid-col" align="center">
+        <div class="monitoreos-title text-h3">Lista de Monitoreos</div>
+        <v-divider class="divider"></v-divider>
+        <v-data-table
+          :headers="headers"
+          :items="monitoreos"
+          :items-per-page="20"
+          class="elevation-1"
+        >
+        </v-data-table>
+      </v-col>
+    </v-row>
+    <v-row class="grid-row">
+      <v-col cols="12" color="black" width="300px"> </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script>
+import axios from "axios";
+import { environment } from "../environment/environment";
+
+export default {
+  name: "Monitoreos",
+  data: () => ({
+    monitoreos: [],
+    headers: [
+      {
+        text: "Frecuencia de Contracciones",
+        align: "start",
+        value: "frecuenciaPromedio",
+      },
+      {
+        text: "Duración Promedio",
+        value: "duracionPromedio",
+      },
+      {
+        text: "Intervalo Promedio",
+        value: "tiempoEcPromedio",
+      },
+      {
+        text: "Movimientos Fetales",
+        value: "cantidadMovFetales",
+      },
+      {
+        text: "Fecha",
+        value: "fechaInicio",
+      },
+      {
+        text: "Hora",
+        value: "fechaInicio",
+      },
+    ],
+  }),
+  created() {
+    this.getMonitoreos();
+  },
+  methods: {
+    getMonitoreos: function () {
+      axios
+        .get(`${environment.api}/gestantes/1/monitoreos`, {
+          headers: {
+            Authorization: "Bearer " + environment.token,
+          },
+        })
+        .then((response) => {
+          //TODO
+          //GET ID
+          console.log(response);
+          console.log(response.data[1]);
+          var i;
+          for (i = 0; i < response.data.length; i++) {
+            var monitoreoActual = {
+              fechaInicio: "",
+              duracionPromedio: 0,
+              frecuenciaPromedio: 0,
+              tiempoEcPromedio: 0,
+              cantidadMovFetales: 0,
+              estado: "",
+            };
+            /*
+            gestanteActual.nombres =
+              response.data[i].nombres +
+              " " +
+              response.data[i].apellidoPaterno +
+              " " +
+              response.data[i].apellidoMaterno;
+            */
+            monitoreoActual.estado = response.data[i].estado;
+            monitoreoActual.fechaInicio = response.data[i].fechaInicio;
+            //monitoreoActual.duracionPromedio = response.data[i].duracionPromedio;
+            monitoreoActual.duracionPromedio = Math.trunc(
+              response.data[i].duracionPromedio
+            );
+            monitoreoActual.frecuenciaPromedio =
+              response.data[i].frecuenciaPromedio;
+            monitoreoActual.tiempoEcPromedio =
+              response.data[i].tiempoEcPromedio;
+            monitoreoActual.duracionPromedio =
+              response.data[i].duracionPromedio;
+            monitoreoActual.cantidadMovFetales =
+              response.data[i].cantidadMovFetales;
+
+            this.monitoreos.push(monitoreoActual);
+          }
+          /*  
+          console.log(response.data);
+
+          localStorage.setItem("token", response.data);
+          this.jwt = VueJwtDecode.decode(localStorage.getItem("token"));
+          localStorage.setItem("role", this.jwt.AUTHORITIES_KEY[0].authority);
+
+          //alert(this.jwt.EntityID)
+          //jwt.getItem("AUTHORITIES_KEY");
+          */
+          //this.$router.push("/");
+        });
+    },
+  },
+};
+</script>
+
+<style>
+.monitoreos-container grid-container {
+  background: white;
+}
+
+.monitoreos-title {
+  text-align: left;
+  margin-bottom: 15px;
+}
+</style>
