@@ -66,16 +66,50 @@ export default {
           password: this.password,
         })
         .then((response) => {
-          console.log(response.data);
+          console.log(response);
+          if (response.status == 200) {
+            localStorage.setItem("token", response.data);
+            this.jwt = VueJwtDecode.decode(localStorage.getItem("token"));
+            //localStorage.setItem("role", this.jwt.AUTHORITIES_KEY[0].authority);
 
-          localStorage.setItem("token", response.data);
-          this.jwt = VueJwtDecode.decode(localStorage.getItem("token"));
-          localStorage.setItem("role", this.jwt.AUTHORITIES_KEY[0].authority);
+            //alert(this.jwt.EntityID)
+            //jwt.getItem("AUTHORITIES_KEY");
 
-          //alert(this.jwt.EntityID)
-          //jwt.getItem("AUTHORITIES_KEY");
-          this.$router.push("/");
+            //Hay que obtener los datos del usuario
+            this.$store.commit('setUserData',{
+              entityId: this.jwt.EntityID,
+              role: this.jwt.AUTHORITIES_KEY[0].authority,
+            })
+            this.$store.commit('handleCurrentSession',{
+              value: true
+            })
+            this.$router.push("/");
+          }
+        })
+        .catch((error) => {
+          console.err(error);
+          alert("El usuario o contraseña ingresado no son correctos")
         });
+
+      alert(this.$store.getters.entityId )
+      if(this.$store.getters.entityId != null){
+        axios.get(`${environment.api}/obstetras/${this.$store.getters.entityId}`,{
+          headers: {
+            Authorization: "Bearer " + environment.token,
+          }
+        })
+        .then((response)=>{
+          alert("asdadasdasd")
+          this.$store.commit('setUserData',{ 
+            name: response.data.nombres + " " + response.data.apellidoPaterno + " " + response.data.apellidoMaterno
+            })
+        });
+      }else{
+        this.$store.commit('setUserData',{ 
+            name: "Administrador"
+            })
+        alert("gaaaaa")
+      }
     },
   },
 };

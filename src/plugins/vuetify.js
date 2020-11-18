@@ -3,4 +3,12 @@ import Vuetify from "vuetify/lib";
 
 Vue.use(Vuetify);
 
-export default new Vuetify({});
+export default new Vuetify({
+    theme: {
+        themes: {
+          light: {
+            secondary: '#00c4cf '
+          },
+        },
+      },
+});

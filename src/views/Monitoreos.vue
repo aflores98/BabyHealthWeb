@@ -61,7 +61,7 @@ export default {
   methods: {
     getMonitoreos: function () {
       axios
-        .get(`${environment.api}/gestantes/1/monitoreos`, {
+        .get(`${environment.api}/gestantes/${this.$store.getters.gestantesSelectedRowId}/monitoreos`, {
           headers: {
             Authorization: "Bearer " + environment.token,
           },

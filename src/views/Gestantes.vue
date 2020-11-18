@@ -11,6 +11,7 @@
           :items="gestantes"
           :items-per-page="10"
           class="elevation-1"
+          @click:row="handleRowClick"
         >
         </v-data-table>
       </v-col>
@@ -67,44 +68,71 @@ export default {
   methods: {
     getGestantes: function () {
       //alert(environment.token);
+      var requestUrl =
+        this.$store.getters.entityId == null
+          ? `${environment.api}/gestantes`
+          : `${environment.api}/obstetras/${this.$store.getters.entityId}/gestantes`;
+      alert(requestUrl);
+
       axios
-        .get(`${environment.api}/gestantes`, {
+        .get(requestUrl, {
           headers: {
             Authorization: "Bearer " + environment.token,
           },
         })
         .then((response) => {
-          //TODO
-          //GET ID
-          console.log(response.data);
-          //console.log(response.data[0].length)
+          console.log(response);
           var i;
 
-          for (i = 0; i < response.data.length; i++) {
-            var gestanteActual = {
+          if (!Array.isArray(response.data)) {
+            var gestanteActual1 = {
+              id: "",
               nombres: "",
               apellidos: "",
               estado: "",
               fechaNacimiento: "",
               semanaGestacional: "",
             };
-            gestanteActual.nombres =
-              response.data[i].nombres +
+
+            gestanteActual1.id = response.data.id;
+            gestanteActual1.nombres =
+              response.data.nombres +
               " " +
-              response.data[i].apellidoPaterno +
+              response.data.apellidoPaterno +
               " " +
-              response.data[i].apellidoMaterno;
-            //gestanteActual.apellidos =
-            gestanteActual.estado = response.data[i].estado;
-            gestanteActual.fechaNacimiento = response.data[i].fechaNacimiento;
-            gestanteActual.semanaGestacional =
-              response.data[i].semanaGestacional;
-            this.gestantes.push(gestanteActual);
-            this.gestantes.push(gestanteActual);
-            this.gestantes.push(gestanteActual);
-            this.gestantes.push(gestanteActual);
-            this.gestantes.push(gestanteActual);
+              response.data.apellidoMaterno;
+            gestanteActual1.estado = response.data.estado;
+            gestanteActual1.fechaNacimiento = response.data.fechaNacimiento;
+            gestanteActual1.semanaGestacional = response.data.semanaGestacional;
+            this.gestantes.push(gestanteActual1);
+          } else {
+            for (i = 0; i < response.data.length; i++) {
+              var gestanteActual2 = {
+                id: "",
+                nombres: "",
+                apellidos: "",
+                estado: "",
+                fechaNacimiento: "",
+                semanaGestacional: "",
+              };
+
+              console.log(response.data[i]);
+              gestanteActual2.nombres =
+                response.data[i].nombres +
+                " " +
+                response.data[i].apellidoPaterno +
+                " " +
+                response.data[i].apellidoMaterno;
+              gestanteActual2.id = response.data[i].id;
+              gestanteActual2.estado = response.data[i].estado;
+              gestanteActual2.fechaNacimiento =
+                response.data[i].fechaNacimiento;
+              gestanteActual2.semanaGestacional =
+                response.data[i].semanaGestacional;
+              this.gestantes.push(gestanteActual2);
+            }
           }
+
           /*  
           console.log(response.data);
 
@@ -117,6 +145,14 @@ export default {
           */
           //this.$router.push("/");
         });
+    },
+    handleRowClick: function (rowData) {
+      console.log(rowData);
+      this.$store.commit("setGestanteTableRowSelected", {
+        gestantesSelectedRowId: rowData.id,
+      });
+
+      this.$router.push("/monitoreos");
     },
   },
 };

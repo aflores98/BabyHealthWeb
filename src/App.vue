@@ -1,6 +1,5 @@
 <template>
   <v-app>
-
     <!--
     <v-app-bar
       app
@@ -40,9 +39,9 @@
     </v-app-bar>
 
 -->
-    
-    <v-navigation-drawer 
-      app 
+
+    <v-navigation-drawer
+      app
       v-if="$route.path != '/login'"
       color="secondary"
       v-model="drawer"
@@ -50,20 +49,15 @@
       permanent
     >
       <v-list-item class="px-2">
-
         <v-list-item-avatar>
-          <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
+          <v-icon>mdi-account-circle</v-icon>
         </v-list-item-avatar>
 
-        <v-list-item-title>Juanelv Salgado</v-list-item-title>
+        <v-list-item-title>{{this.$store.getters.currentUserName}}</v-list-item-title>
 
-        <v-btn
-          icon
-          @click.stop="mini = !mini"
-        >
+        <v-btn icon @click.stop="mini = mini">
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
-
       </v-list-item>
 
       <v-divider></v-divider>
@@ -74,6 +68,7 @@
           :key="item.title"
           :to="item.link"
           link
+          @click="menuActionClick(item.action)"
         >
           <v-list-item-icon>
             <v-icon>{{ item.icon }}</v-icon>
@@ -82,16 +77,31 @@
           <v-list-item-content>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item-content>
-          
         </v-list-item>
+
+        <v-dialog v-model="dialog" persistent max-width="290">
+          
+          <v-card>
+            <v-card-title class="headline">
+              ¿Desea cerrar sesión?
+            </v-card-title>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn text @click="logOut()">
+                Aceptar
+              </v-btn>
+              <v-btn color="blue darken-1" text @click="dialog = false">
+                Cancelar
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-list>
-      
     </v-navigation-drawer>
-    
+
     <v-main>
-      <router-view/>
+      <router-view />
     </v-main>
-    
   </v-app>
 </template>
 
@@ -99,24 +109,49 @@
 //import HelloWorld from './components/HelloWorld';
 
 export default {
-  name: 'App',
+  name: "App",
 
   components: {
-   // HelloWorld,
+    // HelloWorld,
   },
 
   data: () => ({
     drawer: true,
     items: [
-      {title: 'Gestantes', icon: 'mdi-human-pregnant', link:'/gestantes' },
-      {title: 'Configuración', icon: 'mdi-account-cog'}
+      { title: "Inicio", icon: "mdi-chart-line", link: "/" },
+      { title: "Gestantes", icon: "mdi-human-pregnant", link: "/gestantes" },
+      { title: "Configuración", icon: "mdi-account-cog" },
+      { title: "Cerrar Sesión", icon: "mdi-exit-to-app", action: "logout" },
     ],
-    mini: true
+    dialog: false,
+    mini: false,
     //
   }),
+  methods: {
+    menuActionClick(action) {
+      if (action === "logout") {
+        this.dialog = true;
+        
+      }
+    },
+    logOut(){
+      alert("GG")
+      this.dialog = false
+      localStorage.removeItem("token")
+      this.$store.commit('handleCurrentSession',{
+              value: false
+          })
+      this.$store.commit('setUserData',{ 
+            name: "",
+            role: "",
+            entityId: "",
+            })    
+      this.$router.push("/login");
+    }
+  },
 };
 </script>
 
 <style >
-  @import url('https://fonts.googleapis.com/css2?family=Berkshire+Swash&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Berkshire+Swash&display=swap");
 </style>
