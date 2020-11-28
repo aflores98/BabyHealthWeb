@@ -56,7 +56,6 @@
         <v-list-item-title>{{this.$store.getters.currentUserName}}</v-list-item-title>
 
         <v-btn icon @click.stop="mini = mini">
-          <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
       </v-list-item>
 
@@ -106,7 +105,7 @@
 </template>
 
 <script>
-//import HelloWorld from './components/HelloWorld';
+import { environment } from './environment/environment';
 
 export default {
   name: "App",
@@ -114,7 +113,6 @@ export default {
   components: {
     // HelloWorld,
   },
-
   data: () => ({
     drawer: true,
     items: [
@@ -135,8 +133,8 @@ export default {
       }
     },
     logOut(){
-      alert("GG")
       this.dialog = false
+      environment.token = ""
       localStorage.removeItem("token")
       this.$store.commit('handleCurrentSession',{
               value: false
@@ -146,6 +144,11 @@ export default {
             role: "",
             entityId: "",
             })    
+      this.$router.push("/login");
+    }
+  },
+  created(){
+    if ( this.$store.getters.loggedIn == false){
       this.$router.push("/login");
     }
   },

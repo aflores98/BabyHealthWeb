@@ -1,23 +1,24 @@
 <template>
   <v-container fluid class="monitoreos-container">
     <v-row class="grid-row">
-      <div class="monitoreos-title text-h3">Detalle de Monitoreo</div>
-      <v-divider class="divider"></v-divider>
-      <v-col class="grid-col" align="center">
+      <v-col class="grid-col" align="center" cols="6">
+        <div class="monitoreos-title text-h3">Detalle de Monitoreo</div>
+        <v-divider class="divider"></v-divider>
+
         <v-data-table
-          :headers="headers"
+          :headers="headersContracciones"
           :items="contracciones"
           :items-per-page="20"
           class="elevation-1"
         >
         </v-data-table>
       </v-col>
-      <v-col class="grid-col" align="center">
+      <v-col class="grid-col" align="center" cols="6">
         <v-data-table
-          :headers="headers"
+          :headers="headersMovFetales"
           :items="movimientosFetales"
           :items-per-page="20"
-          class="elevation-1"
+          class="elevation-1 dt-contracciones"
         >
         </v-data-table>
       </v-col>
@@ -31,50 +32,107 @@
 <script>
 import axios from "axios";
 import { environment } from "../environment/environment";
+import moment from 'moment';
 
 export default {
   name: "Monitoreos",
   data: () => ({
-    monitoreos: [],
-    headers: [
+    contracciones: [],
+    movimientosFetales: [],
+    headersContracciones: [
       {
-        text: "Frecuencia de Contracciones",
+        text: "Hora",
         align: "start",
-        value: "frecuenciaPromedio",
+        value: "hora",
       },
       {
-        text: "Duración Promedio",
-        value: "duracionPromedio",
+        text: "Duración",
+        value: "duracion",
       },
       {
-        text: "Intervalo Promedio",
-        value: "tiempoEcPromedio",
+        text: "Intervalo",
+        value: "intervalo",
       },
+    ],
+    headersMovFetales: [
       {
-        text: "Movimientos Fetales",
-        value: "cantidadMovFetales",
+        text: "Número",
+        align: "start",
+        value: "idMovimientoFetal",
       },
       {
         text: "Fecha",
-        value: "fechaInicio",
-      },
-      {
-        text: "Hora",
-        value: "fechaInicio",
+        value: "fechaCreacion",
       },
     ],
   }),
   created() {
-    this.getMonitoreos();
+    this.getContracciones();
+    this.getMovFetales();
   },
+
   methods: {
-    getMonitoreos: function () {
+    getContracciones: function () {
       axios
-        .get(`${environment.api}/gestantes/1/monitoreos`, {
-          headers: {
-            Authorization: "Bearer " + environment.token,
-          },
-        })
+        .get(
+          `${environment.api}/monitoreos/${this.$store.getters.monitoreoSelectedRowId}/contracciones`,
+          {
+            headers: {
+              Authorization: "Bearer " + environment.token,
+            },
+          }
+        )
+        .then((response) => {
+          //TODO
+          //GET ID
+          console.log(response);
+          console.log(response.data[1]);
+          var i;
+
+          for (i = 0; i < response.data.length; i++) {
+            var contraccionActual = {
+              hora: "",
+              duracion: 0,
+              intervalo: ""
+            };
+
+            //hora
+            //duracion = fecha fin - fecha inicio
+            //intervalo = fecha inicio 1 - fecha fin 0
+            contraccionActual.hora = moment(response.data[i].fechaInicio, moment.ISO_8601).format("h:mm:ss A")
+            
+            var fechaFin = moment(response.data[i].fechaFin, moment.ISO_8601)
+            var fechaInicio = moment(response.data[i].fechaInicio, moment.ISO_8601)
+            var duracion = fechaFin.diff(fechaInicio)
+            contraccionActual.duracion = duracion / 1000;
+            contraccionActual.duracion += " s"
+
+            
+            if (i > 0){
+              let fechaFinAnterior = moment(response.data[i-1].fechaFin, moment.ISO_8601)
+              let fechaInicioActual = moment(response.data[i].fechaInicio, moment.ISO_8601)
+              contraccionActual.intervalo = fechaInicioActual.diff(fechaFinAnterior) / 1000 + " s";
+            }
+            else{
+              contraccionActual.intervalo = 0
+            }
+
+            this.contracciones.push(contraccionActual);
+          }
+          
+        });
+    },
+    getMovFetales: function () {
+      
+      axios
+        .get(
+          `${environment.api}/monitoreos/${this.$store.getters.monitoreoSelectedRowId}/movimiento-fetal`,
+          {
+            headers: {
+              Authorization: "Bearer " + environment.token,
+            },
+          }
+        )
         .then((response) => {
           //TODO
           //GET ID
@@ -82,50 +140,19 @@ export default {
           console.log(response.data[1]);
           var i;
           for (i = 0; i < response.data.length; i++) {
-            var monitoreoActual = {
-              fechaInicio: "",
-              duracionPromedio: 0,
-              frecuenciaPromedio: 0,
-              tiempoEcPromedio: 0,
-              cantidadMovFetales: 0,
-              estado: "",
+            var movimientoFetalActual = {
+              idMovimientoFetal: "",
+              fechaCreacion: ""
             };
-            /*
-            gestanteActual.nombres =
-              response.data[i].nombres +
-              " " +
-              response.data[i].apellidoPaterno +
-              " " +
-              response.data[i].apellidoMaterno;
-            */
-            monitoreoActual.estado = response.data[i].estado;
-            monitoreoActual.fechaInicio = response.data[i].fechaInicio;
-            //monitoreoActual.duracionPromedio = response.data[i].duracionPromedio;
-            monitoreoActual.duracionPromedio = Math.trunc(
-              response.data[i].duracionPromedio
-            );
-            monitoreoActual.frecuenciaPromedio =
-              response.data[i].frecuenciaPromedio;
-            monitoreoActual.tiempoEcPromedio =
-              response.data[i].tiempoEcPromedio;
-            monitoreoActual.duracionPromedio =
-              response.data[i].duracionPromedio;
-            monitoreoActual.cantidadMovFetales =
-              response.data[i].cantidadMovFetales;
 
-            this.monitoreos.push(monitoreoActual);
+            console.log(response.data)
+            movimientoFetalActual.idMovimientoFetal = response.data[i].idMovimientoFetal;
+            movimientoFetalActual.idMovimientoFetal = i+1;
+            movimientoFetalActual.fechaCreacion = moment(response.data[i].fechaCreacion, moment.ISO_8601).format("h:mm:ss A")
+            
+    
+            this.movimientosFetales.push(movimientoFetalActual);
           }
-          /*  
-          console.log(response.data);
-
-          localStorage.setItem("token", response.data);
-          this.jwt = VueJwtDecode.decode(localStorage.getItem("token"));
-          localStorage.setItem("role", this.jwt.AUTHORITIES_KEY[0].authority);
-
-          //alert(this.jwt.EntityID)
-          //jwt.getItem("AUTHORITIES_KEY");
-          */
-          //this.$router.push("/");
         });
     },
   },
@@ -140,5 +167,10 @@ export default {
 .monitoreos-title {
   text-align: left;
   margin-bottom: 15px;
+}
+
+.dt-contracciones {
+  background: black;
+  margin-top: 80px;
 }
 </style>

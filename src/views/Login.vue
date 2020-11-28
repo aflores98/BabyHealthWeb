@@ -49,7 +49,7 @@ export default {
     jwt: "",
   }),
   created() {
-    if (this.loggedIn) {
+    if ( this.$store.getters.loggedIn){
       this.$router.push("/");
     }
   },
@@ -57,6 +57,33 @@ export default {
     handleLogin() {
       console.log(this.username);
       console.log(this.password);
+    },
+    updateData: function(){
+
+      console.log(localStorage.getItem("token"))
+      console.log("entityId: "+ this.jwt.EntityID)
+      console.log(this.$store.getters.entityId)
+      console.log(this.$store.getters.currentUserName)
+      environment.token = localStorage.getItem("token")
+      
+
+      if(this.$store.getters.entityId != null){
+        axios.get(`${environment.api}/obstetras/${this.$store.getters.entityId}`,{
+          headers: {
+            Authorization: "Bearer " + environment.token,
+          }
+        })
+        .then((response)=>{
+          this.$store.commit('setUserName',{ 
+            name: response.data.nombres + " " + response.data.apellidoPaterno + " " + response.data.apellidoMaterno
+            })
+          
+        });
+      }else{
+        this.$store.commit('setUserName',{ 
+            name: "Administrador"
+            })
+      }
     },
     login: function () {
       //alert("asdadas");
@@ -76,13 +103,16 @@ export default {
             //jwt.getItem("AUTHORITIES_KEY");
 
             //Hay que obtener los datos del usuario
-            this.$store.commit('setUserData',{
-              entityId: this.jwt.EntityID,
+            this.$store.commit('setUserRole',{
               role: this.jwt.AUTHORITIES_KEY[0].authority,
+            })
+            this.$store.commit('setUserEntityId',{
+              entityId: this.jwt.EntityID,
             })
             this.$store.commit('handleCurrentSession',{
               value: true
             })
+            this.updateData()
             this.$router.push("/");
           }
         })
@@ -91,25 +121,19 @@ export default {
           alert("El usuario o contraseña ingresado no son correctos")
         });
 
-      alert(this.$store.getters.entityId )
-      if(this.$store.getters.entityId != null){
-        axios.get(`${environment.api}/obstetras/${this.$store.getters.entityId}`,{
-          headers: {
-            Authorization: "Bearer " + environment.token,
-          }
-        })
-        .then((response)=>{
-          alert("asdadasdasd")
-          this.$store.commit('setUserData',{ 
-            name: response.data.nombres + " " + response.data.apellidoPaterno + " " + response.data.apellidoMaterno
-            })
-        });
-      }else{
-        this.$store.commit('setUserData',{ 
-            name: "Administrador"
-            })
-        alert("gaaaaa")
+      //TODO
+      //No está obteniendose el entityId
+      /*
+      console.log("entityId: " + this.$store.getters.entityId )
+        console.log("TOKEN: " +localStorage.getItem("token"))
+      while(this.$store.getters.entityId == "" && localStorage.getItem("token") == null ){
+        console.log("entityId: " + this.$store.getters.entityId )
+        console.log("TOKEN: " +localStorage.getItem("token"))
       }
+      alert("XDDDDDD")
+      */
+
+      
     },
   },
 };

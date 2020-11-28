@@ -25,6 +25,7 @@
 <script>
 import axios from "axios";
 import { environment } from "../environment/environment";
+import moment from 'moment';
 
 export default {
   name: "Gestantes",
@@ -63,6 +64,8 @@ export default {
     ],
   }),
   created() {
+    console.log("entityId: " + this.$store.getters.entityId )
+      console.log("TOKEN: " +localStorage.getItem("token"))
     this.getGestantes();
   },
   methods: {
@@ -102,7 +105,7 @@ export default {
               " " +
               response.data.apellidoMaterno;
             gestanteActual1.estado = response.data.estado;
-            gestanteActual1.fechaNacimiento = response.data.fechaNacimiento;
+            gestanteActual1.fechaNacimiento = moment(response.data.fechaNacimiento, moment.ISO_8601).format('YYYY MM DD')
             gestanteActual1.semanaGestacional = response.data.semanaGestacional;
             this.gestantes.push(gestanteActual1);
           } else {
@@ -125,8 +128,7 @@ export default {
                 response.data[i].apellidoMaterno;
               gestanteActual2.id = response.data[i].id;
               gestanteActual2.estado = response.data[i].estado;
-              gestanteActual2.fechaNacimiento =
-                response.data[i].fechaNacimiento;
+              gestanteActual2.fechaNacimiento = moment(response.data[i].fechaNacimiento, moment.ISO_8601).format('DD/MM/YYYY')
               gestanteActual2.semanaGestacional =
                 response.data[i].semanaGestacional;
               this.gestantes.push(gestanteActual2);

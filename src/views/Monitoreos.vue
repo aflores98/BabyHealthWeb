@@ -9,6 +9,7 @@
           :items="monitoreos"
           :items-per-page="20"
           class="elevation-1"
+          @click:row="handleRowClick"
         >
         </v-data-table>
       </v-col>
@@ -22,6 +23,7 @@
 <script>
 import axios from "axios";
 import { environment } from "../environment/environment";
+import moment from 'moment';
 
 export default {
   name: "Monitoreos",
@@ -47,11 +49,11 @@ export default {
       },
       {
         text: "Fecha",
-        value: "fechaInicio",
+        value: "fecha",
       },
       {
         text: "Hora",
-        value: "fechaInicio",
+        value: "hora",
       },
     ],
   }),
@@ -74,23 +76,22 @@ export default {
           var i;
           for (i = 0; i < response.data.length; i++) {
             var monitoreoActual = {
-              fechaInicio: "",
+              idMonitoreo: "",
+              fecha: "",
+              hora: "",
               duracionPromedio: 0,
               frecuenciaPromedio: 0,
               tiempoEcPromedio: 0,
               cantidadMovFetales: 0,
               estado: "",
             };
-            /*
-            gestanteActual.nombres =
-              response.data[i].nombres +
-              " " +
-              response.data[i].apellidoPaterno +
-              " " +
-              response.data[i].apellidoMaterno;
-            */
+
+            monitoreoActual.idMonitoreo = response.data[i].idMonitoreo;
             monitoreoActual.estado = response.data[i].estado;
-            monitoreoActual.fechaInicio = response.data[i].fechaInicio;
+            
+            monitoreoActual.fecha = moment(response.data[i].fechaInicio, moment.ISO_8601).format('DD/MM/YYYY')
+            monitoreoActual.hora = moment(response.data[i].fechaInicio, moment.ISO_8601).format('hh:mm:ss A')
+
             //monitoreoActual.duracionPromedio = response.data[i].duracionPromedio;
             monitoreoActual.duracionPromedio = Math.trunc(
               response.data[i].duracionPromedio
@@ -118,6 +119,15 @@ export default {
           */
           //this.$router.push("/");
         });
+    },
+    handleRowClick: function (rowData) {
+      console.log(rowData);
+      alert(rowData.idMonitoreo)
+      this.$store.commit("setMonitoreoSelectedRowId", {
+        monitoreoSelectedRowId: rowData.idMonitoreo,
+      });
+
+      this.$router.push("/monitoreo-detalle");
     },
   },
 };

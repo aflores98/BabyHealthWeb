@@ -13,19 +13,27 @@ export default new Vuex.Store({
       entityId:'',
       role:'',
     },
-    gestantesSelectedRowId: ''
+    gestantesSelectedRowId: '',
+    monitoreoSelectedRowId: '',
   },
   mutations: {
-    setUserData(state, payload){
-      state.currentUser.name = payload.name;
-      state.currentUser.entityId = payload.entityId;
+    setUserRole(state, payload){
       state.currentUser.role = payload.role;
+    },
+    setUserEntityId(state,payload){
+      state.currentUser.entityId = payload.entityId;
+    },
+    setUserName(state, payload){
+      state.currentUser.name = payload.name;
     },
     handleCurrentSession(state, payload){
       state.loggedIn = payload.value
     },
     setGestanteTableRowSelected(state,payload){
       state.gestantesSelectedRowId = payload.gestantesSelectedRowId
+    },
+    setMonitoreoSelectedRowId(state,payload){
+      state.monitoreoSelectedRowId = payload.monitoreoSelectedRowId
     }
   },
   actions: {},
@@ -45,6 +53,9 @@ export default new Vuex.Store({
     },
     loggedIn: state =>{
       return state.loggedIn
+    },
+    monitoreoSelectedRowId: state =>{
+      return state.monitoreoSelectedRowId
     },
   }
 });
