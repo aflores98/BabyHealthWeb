@@ -96,33 +96,23 @@ export default {
             monitoreoActual.duracionPromedio = Math.trunc(
               response.data[i].duracionPromedio
             );
+            monitoreoActual.duracionPromedio = (Math.floor(response.data[i].duracionPromedio * 100) / 100).toFixed(2)
+            monitoreoActual.duracionPromedio += " min"
             monitoreoActual.frecuenciaPromedio =
               response.data[i].frecuenciaPromedio;
             monitoreoActual.tiempoEcPromedio =
               response.data[i].tiempoEcPromedio;
-            monitoreoActual.duracionPromedio =
-              response.data[i].duracionPromedio;
             monitoreoActual.cantidadMovFetales =
               response.data[i].cantidadMovFetales;
 
             this.monitoreos.push(monitoreoActual);
           }
-          /*  
-          console.log(response.data);
-
-          localStorage.setItem("token", response.data);
-          this.jwt = VueJwtDecode.decode(localStorage.getItem("token"));
-          localStorage.setItem("role", this.jwt.AUTHORITIES_KEY[0].authority);
-
-          //alert(this.jwt.EntityID)
-          //jwt.getItem("AUTHORITIES_KEY");
-          */
-          //this.$router.push("/");
         });
+    
     },
     handleRowClick: function (rowData) {
       console.log(rowData);
-      alert(rowData.idMonitoreo)
+      //alert(rowData.idMonitoreo)
       this.$store.commit("setMonitoreoSelectedRowId", {
         monitoreoSelectedRowId: rowData.idMonitoreo,
       });

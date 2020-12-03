@@ -104,6 +104,7 @@ export default {
             var fechaFin = moment(response.data[i].fechaFin, moment.ISO_8601)
             var fechaInicio = moment(response.data[i].fechaInicio, moment.ISO_8601)
             var duracion = fechaFin.diff(fechaInicio)
+            
             contraccionActual.duracion = duracion / 1000;
             contraccionActual.duracion += " s"
 

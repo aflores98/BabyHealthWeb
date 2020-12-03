@@ -67,6 +67,7 @@
           :key="item.title"
           :to="item.link"
           link
+          style="margin-top:10px; margin-bottom:10px"
           @click="menuActionClick(item.action)"
         >
           <v-list-item-icon>
@@ -118,7 +119,7 @@ export default {
     items: [
       { title: "Inicio", icon: "mdi-chart-line", link: "/" },
       { title: "Gestantes", icon: "mdi-human-pregnant", link: "/gestantes" },
-      { title: "Configuración", icon: "mdi-account-cog" },
+      //{ title: "Configuración", icon: "mdi-account-cog" },
       { title: "Cerrar Sesión", icon: "mdi-exit-to-app", action: "logout" },
     ],
     dialog: false,

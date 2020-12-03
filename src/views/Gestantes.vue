@@ -75,7 +75,7 @@ export default {
         this.$store.getters.entityId == null
           ? `${environment.api}/gestantes`
           : `${environment.api}/obstetras/${this.$store.getters.entityId}/gestantes`;
-      alert(requestUrl);
+      //alert(requestUrl);
 
       axios
         .get(requestUrl, {

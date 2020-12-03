@@ -118,7 +118,7 @@ export default {
         })
         .catch((error) => {
           console.err(error);
-          alert("El usuario o contraseña ingresado no son correctos")
+          //alert("El usuario o contraseña ingresado no son correctos")
         });
 
       //TODO
